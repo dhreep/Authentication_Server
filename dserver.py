@@ -13,8 +13,8 @@ import socket
 # print("Server IP Address is:" + IPAddr)
 
 userdict={ "user1":"one", "user2":"two" , "user3":"three" }
-IPAddr="10.0.2.15"
-port = 10200
+IPAddr="10.52.1.147"
+port = 10201
 with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
     s.bind((IPAddr,port))
     s.listen(5)
@@ -31,16 +31,21 @@ with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
                     conn.sendall(b"Enter your password")
                     data = conn.recv(256)
                     pwd = str(data, 'UTF-8')
+                    # print("Recieved Passwd")
                     if userdict[username]==pwd:
+                        # print(f"sending Passwd: {pwd}")
                         conn.sendall(b"You are connected")
+                        # print("Passwd sent")
                         conn.close() 
+                        exit(0)
                     else:
-                        conn.sendall(b"Wrong Password")
-                        conn.sendall(b"Enter password again?(Y/N): ")
+                        conn.sendall(b"Wrong Password Enter password again?(Y/N): ")
                         choice = conn.recv(256)
                         choice = str(choice, 'UTF-8')
                         if(choice=="N" or choice=="n"):
+                            conn.sendall(b"Closing Connection")
                             conn.close()
+                            exit(0)
                         elif(choice=="Y" or choice=="y"):
                             continue 
                         else:
@@ -51,7 +56,9 @@ with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
                 choice = conn.recv(256)
                 choice = str(choice, 'UTF-8')
                 if(choice=="C" or choice=="c"):
+                    conn.sendall(b"Closing Connection")
                     conn.close()
+                    exit(0)
                 elif(choice=="B" or choice=="b"):
                     continue
                 elif(choice=="A" or choice=="a"):
@@ -66,17 +73,18 @@ with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
                         reg_pwd = conn.recv(256)
                         reg_pwd = str(reg_pwd, 'UTF-8')
                         userdict[reg_username]=reg_pwd
-                        conn.sendall(b"Successfully Registered!")
-                        conn.sendall(b"Login?(Y/N): ")
+                        conn.sendall(b"Successfully Registered! Login?(Y/N):")
                         choice = conn.recv(256)
                         choice = str(choice, 'UTF-8')
                         if(choice=="N" or choice=="n"):
+                            conn.sendall(b"Closing Connection")
                             conn.close()
+                            exit(0)
                         elif(choice=="Y" or choice=="y"):
                             break
                         else:
                             conn.sendall(b"Wrong choice.") 
-                            conn.close()  
+                            break  
                 else:
                     conn.sendall(b"Wrong choice.")
                     continue
