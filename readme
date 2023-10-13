@@ -1,0 +1,3 @@
+server, client: dserver,client
+aes/gcm : server_encrypt_try, client_encrypt_try
+aes/gcm + diffie-hellman: server_encrypt_dh, client_encrypt_dh
