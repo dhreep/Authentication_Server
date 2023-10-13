@@ -10,8 +10,9 @@ import uuid
 import socket
 
 userdict={ "user1":"one", "user2":"two" , "user3":"three" }
-IPAddr="10.52.4.14"
-port = 10200
+IPAddr="10.0.2.15"
+port = 10201
+>>>>>>> b0f4e9a01b8e3f033bbc50aaaa1b062448726146
 with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
     s.bind((IPAddr,port))
     s.listen(5)
