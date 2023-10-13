@@ -1,4 +1,8 @@
 import socket
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+from Crypto.Protocol.KDF import PBKDF2
+from diffiehellman import DiffieHellman
 
 HOST = "10.52.4.14"  # The server's hostname or IP address
 PORT = 10200 # The port used by the server
@@ -16,7 +20,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             continue      
         elif blah=="You are connected":
             auth_key = s.recv(256)
-            blah = str(data, 'UTF-8')
+            auth_key = str(auth_key, 'UTF-8')
             s.close()
             break
         data = input().encode()
