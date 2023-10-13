@@ -11,7 +11,7 @@ import socket
 
 userdict={ "user1":"one", "user2":"two" , "user3":"three" }
 IPAddr="10.0.2.15"
-port = 10200
+port = 10201
 with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
     s.bind((IPAddr,port))
     s.listen(5)
@@ -30,7 +30,7 @@ with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as s:
                     pwd = str(data, 'UTF-8')
                     if userdict[username]==pwd:
                         conn.sendall(b"You are connected")
-                        unique_id=uuid.uuid4(32)
+                        unique_id=uuid.uuid4()
                         auth_key=str(unique_id).encode()
                         # add authentication key to the database
                         conn.sendall(auth_key)
