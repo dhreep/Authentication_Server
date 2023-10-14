@@ -12,6 +12,7 @@ from Crypto.Random import get_random_bytes
 from Crypto.Protocol.KDF import PBKDF2
 from diffiehellman import DiffieHellman
 import uuid
+import sqlite3
 
 def aes_encrypt(data,key)->bytes:
     cipher = AES.new(key, AES.MODE_GCM)
@@ -36,6 +37,20 @@ def aes_decrypt(encrypted_data,key)->bytes:
         print("Authentication failed. The data may be tampered.")
         exit(0)
 
+#define conection and cursor
+conn = sqlite3.connect("Servdata.sqlite")
+cursor = conn.cursor()
+#create table
+command1 = """CREATE TABLE IF NOT EXISTS Login
+(
+  Username TEXT NOT NULL,
+  Password TEXT NOT NULL,
+  IP TEXT NOT NULL,
+  Key TEXT,
+  PRIMARY KEY (Username),
+  UNIQUE (IP)
+)"""
+cursor.execute(command1)
 userdict={ "user1":"one", "user2":"two" , "user3":"three" }
 IPAddr="10.52.4.14"
 port = 10200
