@@ -4,7 +4,7 @@ from Crypto.Random import get_random_bytes
 from Crypto.Protocol.KDF import PBKDF2
 from diffiehellman import DiffieHellman
 
-HOST = "10.52.4.14"  # The server's hostname or IP address
+HOST = '10.0.2.15'  # The server's hostname or IP address
 PORT = 10200 # The port used by the server
 
 def aes_encrypt(data,key)->bytes:
@@ -30,40 +30,42 @@ def aes_decrypt(encrypted_data,key)->bytes:
         print("Authentication failed. The data may be tampered.")
         exit(0)
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.connect((HOST, PORT))
-     # Key generation and encryption setup:
-    key_pair = DiffieHellman(group=14, key_bits=32) # automatically generate one key pair    
-    # get own public key and send to server
-    client_public = key_pair.get_public_key() 
-    s.sendall(client_public)    
-    # generate shared key based on the other side's public key
-    server_public = s.recv(1024)
-    client_shared_key = key_pair.generate_shared_key(server_public)      
-    # Use a KDF to derive an AES key from the shared key
-    password = client_shared_key
-    salt = b'salt'  # You should use a different salt
-    key = PBKDF2(password, salt, dkLen=32, count=1000000)
-    # nonce = cipher.nonce
-    while True:
-        encrypted_data = s.recv(256)
-        data = aes_decrypt(encrypted_data=encrypted_data,key=key)
-        blah = str(data, 'UTF-8')
-        print(f"{blah}")
-        if blah == "Closing Connection":
-            s.close()
-            exit(0)   
-        elif blah == "Wrong choice." or blah=="Username already exists.":
-            continue      
-        elif blah=="You are connected":
+def login():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((HOST, PORT))
+        # Key generation and encryption setup:
+        key_pair = DiffieHellman(group=14, key_bits=32) # automatically generate one key pair    
+        # get own public key and send to server
+        client_public = key_pair.get_public_key() 
+        s.sendall(client_public)    
+        # generate shared key based on the other side's public key
+        server_public = s.recv(1024)
+        client_shared_key = key_pair.generate_shared_key(server_public)      
+        # Use a KDF to derive an AES key from the shared key
+        password = client_shared_key
+        salt = b'salt'  # You should use a different salt
+        key = PBKDF2(password, salt, dkLen=32, count=1000000)
+        # nonce = cipher.nonce
+        while True:
             encrypted_data = s.recv(256)
-            auth_key = aes_decrypt(encrypted_data=encrypted_data,key=key)
-            auth_key = str(auth_key, 'UTF-8')
-            s.close()
-            break
-        data = input().encode()
-        encrypted_data = aes_encrypt(data=data,key=key)
-        s.sendall(encrypted_data)
-    #key has been received
-    print(auth_key)
+            data = aes_decrypt(encrypted_data=encrypted_data,key=key)
+            blah = str(data, 'UTF-8')
+            print(f"{blah}")
+            if blah == "Closing Connection":
+                s.close()
+                exit(0)   
+            elif blah == "Wrong choice." or blah=="Username already exists.":
+                continue      
+            elif blah=="You are connected":
+                encrypted_data = s.recv(256)
+                auth_key = aes_decrypt(encrypted_data=encrypted_data,key=key)
+                auth_key = str(auth_key, 'UTF-8')
+                s.close()
+                break
+            data = input().encode()
+            encrypted_data = aes_encrypt(data=data,key=key)
+            s.sendall(encrypted_data)
+        #key has been received
+        # print(auth_key)
+        return auth_key
 
